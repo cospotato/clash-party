@@ -230,7 +230,7 @@
   "mihomo.coreUpgradeSuccess": "Ядро успешно обновлено. Если вы хотите использовать виртуальную сетевую карту (Tun), пожалуйста, перейдите на страницу виртуальной сетевой карты для повторной авторизации ядра",
   "mihomo.alreadyLatestVersion": "Уже последняя версия",
   "mihomo.selectCoreVersion": "Выберите версию ядра",
-  "mihomo.stableVersion": "Стабильная",
+  "mihomo.oixVersion": "OIX",
   "mihomo.alphaVersion": "Альфа",
   "mihomo.smartVersion": "Smart",
   "mihomo.specificVersion": "Выбрать версию",

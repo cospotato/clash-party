@@ -237,7 +237,7 @@
   "mihomo.coreUpgradeSuccess": "內核升級成功，若要使用虛擬網卡（Tun），請到虛擬網卡頁面重新手動授權內核",
   "mihomo.alreadyLatestVersion": "已經是最新版本",
   "mihomo.selectCoreVersion": "選擇內核版本",
-  "mihomo.stableVersion": "穩定版",
+  "mihomo.oixVersion": "OIX",
   "mihomo.alphaVersion": "預覽版",
   "mihomo.smartVersion": "Smart 版",
   "mihomo.specificVersion": "特定版本",

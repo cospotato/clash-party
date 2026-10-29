@@ -5,6 +5,9 @@
 
 <h3 align="center">Another <a href="https://github.com/MetaCubeX/mihomo">Mihomo</a> GUI</h3>
 
+> **Fork note:** this build uses [mihomo-oix](https://github.com/vernesong/mihomo-oix)
+> in the default core slot and builds through GitHub Actions. See [FORK.md](./FORK.md).
+
 <p align="center">
   <a href="https://github.com/mihomo-party-org/clash-party/releases">
     <img src="https://img.shields.io/github/release/mihomo-party-org/clash-party/all.svg">

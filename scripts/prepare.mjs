@@ -87,10 +87,10 @@ async function getLatestSmartVersion() {
   }
 }
 
-/* ======= mihomo release ======= */
+/* ======= mihomo-oix (used in the default/stable slot) ======= */
 const MIHOMO_VERSION_URL =
-  'https://github.com/MetaCubeX/mihomo/releases/latest/download/version.txt'
-const MIHOMO_URL_PREFIX = `https://github.com/MetaCubeX/mihomo/releases/download`
+  'https://github.com/vernesong/mihomo-oix/releases/download/Pre-Alpha/version.txt'
+const MIHOMO_URL_PREFIX = `https://github.com/vernesong/mihomo-oix/releases/download/Pre-Alpha`
 let MIHOMO_VERSION
 
 const MIHOMO_MAP = {
@@ -103,7 +103,7 @@ const MIHOMO_MAP = {
   'linux-arm64': 'mihomo-linux-arm64'
 }
 
-// Fetch the latest release version from the version.txt file
+// Fetch the latest mihomo-oix version from the rolling Pre-Alpha release
 async function getLatestReleaseVersion() {
   try {
     const response = await fetch(MIHOMO_VERSION_URL, {
@@ -111,9 +111,9 @@ async function getLatestReleaseVersion() {
     })
     let v = await response.text()
     MIHOMO_VERSION = v.trim() // Trim to remove extra whitespaces
-    console.log(`Latest release version: ${MIHOMO_VERSION}`)
+    console.log(`Latest mihomo-oix version: ${MIHOMO_VERSION}`)
   } catch (error) {
-    console.error('Error fetching latest release version:', error.message)
+    console.error('Error fetching latest mihomo-oix version:', error.message)
     process.exit(1)
   }
 }
@@ -157,7 +157,7 @@ function mihomo() {
   const name = MIHOMO_MAP[`${platform}-${arch}`]
   const isWin = platform === 'win32'
   const urlExt = isWin ? 'zip' : 'gz'
-  const downloadURL = `${MIHOMO_URL_PREFIX}/${MIHOMO_VERSION}/${name}-${MIHOMO_VERSION}.${urlExt}`
+  const downloadURL = `${MIHOMO_URL_PREFIX}/${name}-${MIHOMO_VERSION}.${urlExt}`
   const exeFile = `${name}${isWin ? '.exe' : ''}`
   const zipFile = `${name}-${MIHOMO_VERSION}.${urlExt}`
 

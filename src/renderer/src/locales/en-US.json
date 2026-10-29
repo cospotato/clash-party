@@ -237,7 +237,7 @@
   "mihomo.coreUpgradeSuccess": "Core upgrade successful. If you want to use virtual network card (Tun), please go to the virtual network card page to manually authorize the Core again",
   "mihomo.alreadyLatestVersion": "Already Latest Version",
   "mihomo.selectCoreVersion": "Select Core Version",
-  "mihomo.stableVersion": "Stable",
+  "mihomo.oixVersion": "OIX",
   "mihomo.alphaVersion": "Alpha",
   "mihomo.smartVersion": "Smart",
   "mihomo.specificVersion": "Specific Version",

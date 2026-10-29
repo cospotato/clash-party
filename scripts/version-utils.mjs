@@ -62,10 +62,11 @@ export function getProcessedVersion() {
 
 // 生成下载URL
 export function getDownloadUrl(isDev, version) {
+  const repo = process.env.GITHUB_REPOSITORY || 'mihomo-party-org/clash-party'
   if (isDev) {
-    return 'https://github.com/mihomo-party-org/clash-party/releases/download/dev'
+    return `https://github.com/${repo}/releases/download/dev`
   } else {
-    return `https://github.com/mihomo-party-org/clash-party/releases/download/v${version}`
+    return `https://github.com/${repo}/releases/download/v${version}`
   }
 }
 

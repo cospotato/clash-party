@@ -356,6 +356,11 @@ jobs:
           - x64
           - arm64
     runs-on: macos-latest
+    env:
+      MACOS_CSC_LINK: ${{ secrets.CSC_LINK }}
+      CSC_INSTALLER_LINK: ${{ secrets.CSC_INSTALLER_LINK }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -382,9 +387,9 @@ jobs:
           npm_config_target_arch: ${{ matrix.arch }}
         run: pnpm prepare --${{ matrix.arch }}
       - name: Import Developer ID application certificate
+        if: env.MACOS_CSC_LINK != ''
         shell: bash
         env:
-          MACOS_CSC_LINK: ${{ secrets.CSC_LINK }}
           MACOS_CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: |
           set -euo pipefail
@@ -430,22 +435,30 @@ jobs:
           chmod +x build/pkg-scripts/postinstall build/pkg-scripts/preinstall
           pnpm build:mac --${{ matrix.arch }}
       - name: Setup temporary installer signing keychain
+        if: env.CSC_INSTALLER_LINK != ''
         uses: apple-actions/import-codesign-certs@v6
         with:
           p12-file-base64: ${{ secrets.CSC_INSTALLER_LINK }}
           p12-password: ${{ secrets.CSC_INSTALLER_KEY_PASSWORD }}
       - name: Sign the Apple pkg
+        if: env.CSC_INSTALLER_LINK != '' && env.APPLE_ID != ''
         run: |
           for pkg_name in $(ls -1 dist/*.pkg); do
             pkg_name=$(ls -1 dist/*.pkg)
             mv $pkg_name Unsigned-Workbench.pkg
-            productsign --sign "Developer ID Installer: Prometheus Advertising Corp (489PDK5LP3)" Unsigned-Workbench.pkg $pkg_name
+            identity="${CSC_INSTALLER_NAME:-$(security find-identity -v -p basic | awk -F'"' '/Developer ID Installer/ { print $2; exit }')}"
+            if [ -z "$identity" ]; then
+              echo "::error::No Developer ID Installer identity found"
+              exit 1
+            fi
+            productsign --sign "$identity" Unsigned-Workbench.pkg $pkg_name
             rm -f Unsigned-Workbench.pkg
             xcrun notarytool submit $pkg_name --apple-id $APPLE_ID --team-id $APPLE_TEAM_ID --password $APPLE_APP_SPECIFIC_PASSWORD --wait
             xcrun stapler staple $pkg_name
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_INSTALLER_NAME: ${{ secrets.CSC_INSTALLER_NAME }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -492,6 +505,11 @@ jobs:
           - x64
           - arm64
     runs-on: macos-latest
+    env:
+      MACOS_CSC_LINK: ${{ secrets.CSC_LINK }}
+      CSC_INSTALLER_LINK: ${{ secrets.CSC_INSTALLER_LINK }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -520,9 +538,9 @@ jobs:
           npm_config_target_arch: ${{ matrix.arch }}
         run: pnpm prepare --${{ matrix.arch }}
       - name: Import Developer ID application certificate
+        if: env.MACOS_CSC_LINK != ''
         shell: bash
         env:
-          MACOS_CSC_LINK: ${{ secrets.CSC_LINK }}
           MACOS_CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: |
           set -euo pipefail
@@ -569,22 +587,30 @@ jobs:
           chmod +x build/pkg-scripts/postinstall build/pkg-scripts/preinstall
           pnpm build:mac --${{ matrix.arch }}
       - name: Setup temporary installer signing keychain
+        if: env.CSC_INSTALLER_LINK != ''
         uses: apple-actions/import-codesign-certs@v6
         with:
           p12-file-base64: ${{ secrets.CSC_INSTALLER_LINK }}
           p12-password: ${{ secrets.CSC_INSTALLER_KEY_PASSWORD }}
       - name: Sign the Apple pkg
+        if: env.CSC_INSTALLER_LINK != '' && env.APPLE_ID != ''
         run: |
           for pkg_name in $(ls -1 dist/*.pkg); do
             pkg_name=$(ls -1 dist/*.pkg)
             mv $pkg_name Unsigned-Workbench.pkg
-            productsign --sign "Developer ID Installer: Prometheus Advertising Corp (489PDK5LP3)" Unsigned-Workbench.pkg $pkg_name
+            identity="${CSC_INSTALLER_NAME:-$(security find-identity -v -p basic | awk -F'"' '/Developer ID Installer/ { print $2; exit }')}"
+            if [ -z "$identity" ]; then
+              echo "::error::No Developer ID Installer identity found"
+              exit 1
+            fi
+            productsign --sign "$identity" Unsigned-Workbench.pkg $pkg_name
             rm -f Unsigned-Workbench.pkg
             xcrun notarytool submit $pkg_name --apple-id $APPLE_ID --team-id $APPLE_TEAM_ID --password $APPLE_APP_SPECIFIC_PASSWORD --wait
             xcrun stapler staple $pkg_name
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_INSTALLER_NAME: ${{ secrets.CSC_INSTALLER_NAME }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -625,6 +651,8 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     needs: [windows, windows7, linux, macos, macos10]
     runs-on: ubuntu-latest
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -643,15 +671,13 @@ jobs:
           GITHUB_EVENT_NAME: workflow_dispatch
         run: node scripts/update-version.mjs
       - name: Telegram Notification
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: env.TELEGRAM_BOT_TOKEN != '' && startsWith(github.ref, 'refs/tags/v')
         env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           RELEASE_TYPE: release
         run: pnpm telegram
       - name: Telegram Dev Notification
-        if: github.event_name == 'workflow_dispatch'
+        if: env.TELEGRAM_BOT_TOKEN != '' && github.event_name == 'workflow_dispatch'
         env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           GITHUB_SHA: ${{ github.sha }}
           RELEASE_TYPE: dev
         run: pnpm telegram:dev

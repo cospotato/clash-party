@@ -56,7 +56,7 @@ import {
 } from '../../../shared/appConfig'
 
 const CoreMap = {
-  mihomo: 'mihomo.stableVersion',
+  mihomo: 'mihomo.oixVersion',
   'mihomo-alpha': 'mihomo.alphaVersion',
   'mihomo-smart': 'mihomo.smartVersion',
   'mihomo-specific': 'mihomo.specificVersion'
